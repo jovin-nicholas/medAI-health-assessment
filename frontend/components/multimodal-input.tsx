@@ -23,12 +23,13 @@ import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { sanitizeUIMessages } from '@/lib/utils';
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
+import { ArrowUpIcon, PaperclipIcon, PlayIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
+import { MicIcon } from 'lucide-react';
 
 function PureMultimodalInput({
   chatId,
@@ -51,7 +52,7 @@ function PureMultimodalInput({
   stop: () => void;
   attachments: Array<Attachment>;
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
-  messages: Array<Message>;
+  messages: Message[];
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
   append: (
     message: Message | CreateMessage,
@@ -116,6 +117,11 @@ function PureMultimodalInput({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
+
+  const handleAudioInput = (audioBlob: Blob) => {
+    // Handle the audio input here
+    console.log('Audio input received:', audioBlob);
+  };
 
   const submitForm = useCallback(() => {
     window.history.replaceState({}, '', `/chat/${chatId}`);
@@ -256,6 +262,7 @@ function PureMultimodalInput({
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
         <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
+        <AudioButton onAudioInput={handleAudioInput} />
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
@@ -283,6 +290,59 @@ export const MultimodalInput = memo(
     return true;
   },
 );
+
+
+interface MicButtonProps {
+  onAudioInput: (audioBlob: Blob) => void;
+}
+
+function MicButton({ onAudioInput }: MicButtonProps) {
+  const [isRecording, setIsRecording] = useState(false);
+  // let mediaRecorder: MediaRecorder;
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  let audioChunks: Blob[] = [];
+
+  const startRecording = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = mediaRecorder;
+    mediaRecorder.start();
+    setIsRecording(true);
+
+    mediaRecorder.ondataavailable = (event) => {
+      audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      onAudioInput(audioBlob);
+      audioChunks = [];
+    };
+  };
+
+  const stopRecording = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  return (
+    <button onClick={(event) => {
+      event.preventDefault();
+      window.open('http://localhost:3001/');
+    }}>
+      {<MicIcon size={16} />}
+    </button>
+    // <button onClick={isRecording ? stopRecording : startRecording}>
+    //   {isRecording ? <StopIcon size={16} /> : <MicIcon size={16} />}
+    // </button>
+  );
+}
+
+const AudioButton = memo(MicButton);
 
 function PureAttachmentsButton({
   fileInputRef,

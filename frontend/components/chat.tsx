@@ -41,8 +41,7 @@ export function Chat({
     stop,
     reload,
   } = useChat({
-    id,
-    body: { id, modelId: selectedModelId },
+    api: '/api/proxy',
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,

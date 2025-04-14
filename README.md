@@ -8,7 +8,7 @@ Engage with a smart, multi-lingual medical chatbot that understands your symptom
 
 ## Model Providers
 
-This project ships with Gemini `1.5 Flash` as the default. However, with the [AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://sdk.vercel.ai/providers/ai-sdk-providers) with just a few lines of code.
+This project ships with Google `Gemini 1.5 Flash` as the default. However, with the [AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://sdk.vercel.ai/providers/ai-sdk-providers) with just a few lines of code.
 
 ## Running locally
 
@@ -20,9 +20,17 @@ You will need to use the environment variables [defined in `.env.example`](.env.
 2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
 3. Download your environment variables: `vercel env pull`
 
+### Frontend 
 ```bash
 pnpm install
 pnpm dev
+```
+
+### Backend 
+```
+pip install -r requirements.txt
+
+python server.py
 ```
 
 Your app should now be running on [localhost:3000](http://localhost:3000/).
