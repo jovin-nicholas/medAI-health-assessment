@@ -1,15 +1,14 @@
 import { auth } from '@/app/(auth)/auth';
-import { getMostRecentUserMessage } from '@/lib/utils';
-import { formatDataStreamPart } from '@ai-sdk/ui-utils';
+import { generateUUID, getMostRecentUserMessage } from '@/lib/utils';
+import { formatDataStreamPart } from 'ai';
 import { generateTitleFromUserMessage } from '@/app/(chat)/actions';
 
 import {
     deleteChatById,
     getChatById,
     saveChat,
-    saveMessages,
+    saveMessages
 } from '@/lib/db/queries';
-import { generateUUID } from '@/lib/utils';
 
 export async function POST(req: Request) {
     const session = await auth();
